@@ -1,15 +1,13 @@
 # Reap Protocol SDK
 
-**The official SDK for the Reap Protocol: The Agentic Commerce Grid.**
+Give your AI Agent the power to search real products, verify inventory, and purchase autonomously. Reap bridges Web2 shops with Web3 settlement so agents can operate in the real economy — safely, verifiably, and on-chain.
 
-The Reap Protocol enables AI Agents to search for products, register them on-chain, and execute purchases seamlessly. It acts as the bridge between Web2 products and Web3 settlement. Its your all in one **onchain x402 faciliatator**.
+## Why Reap
 
-## ⚡ Why use the Grid?
-
-* **Search & Stock:** Instantly index Web2 products inventory onto the blockchain.
-* **x402 Protocol:** Built-in support for HTTP x402 Payment Negotiation loops.
-* **Agentic Cart:** Composite purchase missions (Identity + Inventory + Settlement) in a single atomic transaction.
-* **Self-Custody:** Your Agent holds the keys. The Grid handles the commerce complexity.
+* **Product Search → On-Chain Inventory**: Agents can index any Web2 product with a single call.
+* **x402 Negotiation Engine**: Turns HTTP into a payment-capable negotiation loop.
+* **Agentic Cart**: Identity, stock, and settlement in a single atomic mission.
+* **Self-Custody by Design**: The agent controls its wallet; Reap handles the complexity.
 
 
 ## License
