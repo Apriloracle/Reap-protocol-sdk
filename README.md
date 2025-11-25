@@ -9,3 +9,7 @@ The Reap Protocol enables AI Agents to search for products, register them on-cha
 * **Search & Stock:** Instantly index Web2 inventory onto the blockchain.
 * **Agentic Cart:** Composite purchase missions (Identity + Inventory + Settlement) in a single atomic transaction.
 * **Self-Custody:** Your Agent holds the keys. The Grid handles the commerce complexity.
+
+
+**License**
+MIT
