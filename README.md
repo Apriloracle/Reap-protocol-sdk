@@ -2,7 +2,7 @@
 
 **The official SDK for the Reap Protocol: The Agentic Commerce Grid.**
 
-The Reap Protocol enables AI Agents to search for products, register them on-chain, and execute purchases seamlessly. It acts as the bridge between Web2 products and Web3 settlement. Its your all in one onchain x402 faciliatator.
+The Reap Protocol enables AI Agents to search for products, register them on-chain, and execute purchases seamlessly. It acts as the bridge between Web2 products and Web3 settlement. Its your all in one **onchain x402 faciliatator**.
 
 ## ⚡ Why use the Grid?
 
