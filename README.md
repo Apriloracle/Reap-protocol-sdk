@@ -11,5 +11,6 @@ The Reap Protocol enables AI Agents to search for products, register them on-cha
 * **Self-Custody:** Your Agent holds the keys. The Grid handles the commerce complexity.
 
 
-**License**
+## License
+
 MIT
