@@ -5,20 +5,20 @@
 The Reap Protocol enables AI Agents to search for products, register them on-chain (Base Sepolia), and execute atomic purchases without needing to understand smart contract ABIs. It acts as the bridge between Web2 data availability and Web3 settlement logic.
 
 ## 📦 Installation
-
 ```bash
 npm install @reap-protocol/sdk ethers axios
+```
 
+## 🚀 Quick Start
 
+This example demonstrates the full Agentic Commerce Loop: Identity -> Discovery -> Settlement.
 
-🚀 Quick Start
+### 1. Setup
 
-1. Setup
 If using TypeScript, ensure your tsconfig.json targets ES2020 or higher.
 
-2. The Agent Code
-
-
+### 2. The Agent Code (agent.ts)
+```typescript
 import { ReapClient } from "@reap-protocol/sdk";
 
 // Load your private key securely
@@ -69,32 +69,35 @@ async function main() {
 }
 
 main();
+```
 
-
-3. Run It
-
+### 3. Run It
+```bash
 # Install execution tools if you haven't already
 npm install --save-dev ts-node typescript @types/node
 
 # Run
 npx ts-node agent.ts
+```
 
+## 🔧 Configuration
 
-🔧 Configuration
-
+You can override defaults for custom RPCs or self-hosted middleware.
+```typescript
 const client = new ReapClient(
   "YOUR_PRIVATE_KEY",
   "https://base-sepolia.g.alchemy.com/v2/YOUR_KEY", // Custom RPC
   "https://api.reap.deals"    // Middleware URL
 );
+```
 
+## ✨ Features
 
-✨ Features
-Typed Interfaces: Full TypeScript support for Product Data and Transactions.
-Agentic Cart: Automatically routes purchases through the Protocol's batch processor.
-Protocol Negotiation: Built-in support for HTTP 402 Payment Negotiation loops.
-Gas Optimized: Checks on-chain state before sending registration transactions.
+* **Agentic Cart**: Routes single or multiple items through a batch processor, optimizing gas and handling USDC approvals automatically.
+* **JIT Stocking**: "Just-In-Time" inventory system. If an agent searches for an item not yet on the blockchain, the Protocol indexes it in real-time.
+* **Self-Custody**: Your private key never leaves your local machine. The SDK signs transactions locally.
+* **Smart Updates**: The Middleware checks on-chain state to prevent redundant transactions.
 
+## License
 
-License
 MIT
