@@ -2,7 +2,7 @@
 
 **The official TypeScript/Node.js SDK for the Reap Protocol: The Agentic Commerce Grid.**
 
-The Reap Protocol enables AI Agents to search for products, register them on-chain (Base Sepolia), and execute atomic purchases without needing to understand smart contract ABIs. It acts as the bridge between Web2 data availability and Web3 settlement logic.
+The Reap Protocol enables AI Agents to search for products, register them on-chain, and execute atomic purchases without needing to understand smart contract ABIs. It acts as the bridge between Web2 products data and Web3 commerce settlement.
 
 ## 📦 Installation
 ```bash
