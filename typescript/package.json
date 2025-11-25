@@ -1,0 +1,21 @@
+{
+  "name": "@reap-protocol/sdk",
+  "version": "0.1.0",
+  "description": "The official SDK for the Reap Protocol: The Agentic Commerce Grid.",
+  "homepage": "https://protocol.reap.deals",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "ethers": "^6.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
