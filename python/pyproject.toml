@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "reap-protocol"
+version = "0.1.0"
+description = "Official SDK for the Reap Protocol: Onchain x402 Commerce Layer"
+readme = "README.md"
+requires-python = ">=3.7"
+dependencies = ["requests", "web3"]
+
+[project.urls]
+"Homepage" = "https://reap.deals"
