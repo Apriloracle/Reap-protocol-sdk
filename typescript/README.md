@@ -6,6 +6,7 @@ The Reap Protocol enables AI Agents to search for products, register them on-cha
 
 ## 📦 Installation
 
+```bash
 npm install @reap-protocol/sdk ethers axios
 
 
@@ -16,6 +17,8 @@ npm install @reap-protocol/sdk ethers axios
 If using TypeScript, ensure your tsconfig.json targets ES2020 or higher.
 
 2. The Agent Code
+
+
 import { ReapClient } from "@reap-protocol/sdk";
 
 // Load your private key securely
@@ -67,7 +70,9 @@ async function main() {
 
 main();
 
+
 3. Run It
+
 # Install execution tools if you haven't already
 npm install --save-dev ts-node typescript @types/node
 
@@ -76,6 +81,7 @@ npx ts-node agent.ts
 
 
 🔧 Configuration
+
 const client = new ReapClient(
   "YOUR_PRIVATE_KEY",
   "https://base-sepolia.g.alchemy.com/v2/YOUR_KEY", // Custom RPC
