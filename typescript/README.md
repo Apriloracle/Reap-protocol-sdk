@@ -93,10 +93,10 @@ const client = new ReapClient(
 
 ## ✨ Features
 
-* **Agentic Cart**: Routes single or multiple items through a batch processor, optimizing gas and handling USDC approvals automatically.
-* **JIT Stocking**: "Just-In-Time" inventory system. If an agent searches for an item not yet on the blockchain, the Protocol indexes it in real-time.
-* **Self-Custody**: Your private key never leaves your local machine. The SDK signs transactions locally.
-* **Smart Updates**: The Middleware checks on-chain state to prevent redundant transactions.
+* **Typed Interfaces**: Full TypeScript support for Product Data and Transactions.
+* **Agentic Cart**: Automatically routes purchases through the Protocol's batch processor.
+* **Protocol Negotiation**: Built-in support for HTTP 402 Payment Negotiation loops.
+* **Gas Optimized**: Checks on-chain state before sending registration transactions.
 
 ## License
 
