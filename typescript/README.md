@@ -93,7 +93,7 @@ const client = new ReapClient(
 
 ## ✨ Features
 
-* **Typed Interfaces**: Full TypeScript support for Product Data and Transactions.
+* **JIT Stocking**: "Just-In-Time" inventory system. If an agent searches for an item not yet on the blockchain, the Protocol indexes it in real-time.
 * **Agentic Cart**: Automatically routes purchases through the Protocol's batch processor.
 * **Protocol Negotiation**: Built-in support for HTTP 402 Payment Negotiation loops.
 * **Gas Optimized**: Checks on-chain state before sending registration transactions.
