@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "reap-protocol"
 version = "0.1.0"
-description = "Official SDK for the Reap Protocol: Onchain x402 Commerce Layer"
+description = "Official SDK for the Reap Protocol: Agentic Commerce Grid"
 readme = "README.md"
 requires-python = ">=3.7"
 dependencies = ["requests", "web3"]
