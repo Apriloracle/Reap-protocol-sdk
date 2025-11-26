@@ -8,7 +8,7 @@ export class ReapClient {
 
   constructor(
     privateKey: string, 
-    chainRpc: string = "https://sepolia.base.org", 
+    chainRpc: string = "https://avalanche-fuji.drpc.org", 
     builderUrl: string = "https://api.reap.deals"
   ) {
     this.provider = new ethers.JsonRpcProvider(chainRpc);
