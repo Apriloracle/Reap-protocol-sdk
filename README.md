@@ -1,5 +1,7 @@
 # Reap Protocol SDK
 
+![Reap Protocol](./assets/android-chrome-192x192.png)
+
 Give your AI Agent the power to search real products, verify inventory, and purchase autonomously. Reap bridges Web2 shops with Web3 settlement so agents can operate in the real economy — safely, verifiably, and on-chain.
 
 ## Why Reap
