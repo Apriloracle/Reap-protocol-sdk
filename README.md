@@ -9,6 +9,12 @@ Give your AI Agent the power to search real products, verify inventory, and purc
 * **Agentic Cart**: Identity, stock, and settlement in a single atomic mission.
 * **Self-Custody by Design**: The agent controls its wallet; Reap handles the complexity.
 
+## Contract Address
+
+* **Base_Sepolia**: 0x93498CAda15768E301AB8C6fc3Bc17402Ad078AA
+* **Avax_Fuji**:    0x93498CAda15768E301AB8C6fc3Bc17402Ad078AA
+* **Celo_Sepolia**: 0x93498CAda15768E301AB8C6fc3Bc17402Ad078AA
+* **Arc_Testnet**:  0x93498CAda15768E301AB8C6fc3Bc17402Ad078AA
 
 ## License
 
