@@ -1,8 +1,6 @@
 {
   "name": "@reap-protocol/sdk",
-  "version": "0.1.0",
-  "description": "The official SDK for the Reap Protocol: The Agentic Commerce Grid.",
-  "homepage": "https://protocol.reap.deals",
+  "version": "0.1.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -17,5 +15,9 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Apriloracle/Reap-protocol-sdk.git"
   }
 }
