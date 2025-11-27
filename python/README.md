@@ -68,7 +68,7 @@ You can override defaults for custom RPCs or self-hosted middleware.
 client = ReapClient(
     private_key="...",
     chain_rpc="https://base-sepolia.g.alchemy.com/v2/YOUR_KEY", # Faster RPC
-    builder_url="https://api.reap.deals" # Official Middleware
+    builder_url="https://avax.api.reap.deals" # Official Middleware
 )
 ```
 
