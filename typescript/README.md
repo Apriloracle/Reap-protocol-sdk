@@ -87,7 +87,7 @@ You can override defaults for custom RPCs or self-hosted middleware.
 const client = new ReapClient(
   "YOUR_PRIVATE_KEY",
   "https://base-sepolia.g.alchemy.com/v2/YOUR_KEY", // Custom RPC
-  "https://api.reap.deals"    // Middleware URL
+  "https://avax.api.reap.deals"    // Middleware URL
 );
 ```
 
