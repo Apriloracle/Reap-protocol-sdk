@@ -1,5 +1,7 @@
 import requests
 import time
+import json
+import urllib.parse
 from web3 import Web3
 
 # --- COMPATIBILITY FIX: MIDDLEWARE (V6 vs V7) ---
@@ -11,73 +13,93 @@ except ImportError:
     POAMiddleware = geth_poa_middleware
 # ------------------------------------------------
 
+# --- CONSTANTS & ABIS ---
+HOLOCRON_ROUTER_ADDRESS = "0x2cEC5Bf3a0D3fEe4E13e8f2267176BdD579F4fd8"
+
+HOLOCRON_ABI = [
+    {"inputs": [{"name": "_c", "type": "uint256"}], "name": "checkExistence", "outputs": [{"name": "", "type": "bool"}], "stateMutability": "view", "type": "function"},
+    {"inputs": [{"name": "_c", "type": "uint256"}], "name": "stock", "outputs": [], "stateMutability": "nonpayable", "type": "function"}
+]
+    # Chains to scan
+SCAN_NETWORKS = {
+        "BASE": "https://sepolia.base.org",
+        "AVAX": "https://api.avax-test.network/ext/bc/C/rpc",
+        "CELO": "https://forno.celo-sepolia.celo-testnet.org"
+    }
+
+
 class ReapClient:
-    def __init__(self, private_key, chain_rpc="https://sepolia.base.org", builder_url="https://api.reap.deals"):
+    def __init__(self, private_key, chain_rpc="https://avalanche-fuji.drpc.org", builder_url="https://avax2.api.reap.deals"):
         """
         Initialize the Reap Protocol Agent.
         """
-        self.builder_url = builder_url.rstrip('/') # Remove trailing slash if present
+        self.builder_url = builder_url.rstrip('/') 
         
         # Web3 Setup
         self.w3 = Web3(Web3.HTTPProvider(chain_rpc))
         self.w3.middleware_onion.inject(POAMiddleware, layer=0)
         self.account = self.w3.eth.account.from_key(private_key)
         
-        print(f"🤖 Reap Agent Online: {self.account.address}")
+        print("🔌 Connecting to Chain...")
+        try:
+            self.chain_id = self.w3.eth.chain_id
+        except Exception as e:
+            print(f"⚠️ Warning: Could not fetch Chain ID on startup: {e}")
+            self.chain_id = 43113 # Default fallback
+
+        print(f"🤖 Reap Agent Online: {self.account.address} (Chain ID: {self.chain_id})")
+
+        # Initialize Holocron Contract
+        self.holocron = self.w3.eth.contract(address=HOLOCRON_ROUTER_ADDRESS, abi=HOLOCRON_ABI)
 
     def _execute_transactions(self, tx_list):
         receipts = []
         
-        # 1. Fetch Nonce ONCE at the start
+        # 1. FIX: Use 'pending' nonce to allow rapid sequential transactions
         current_nonce = self.w3.eth.get_transaction_count(self.account.address, 'pending')
         
+        # 2. FIX: Buffer Gas Price (1.1x) to prevent "underpriced" errors on Base
+        gas_price = int(self.w3.eth.gas_price * 1.10)
+
         for i, tx_data in enumerate(tx_list):
             label = tx_data.get('label', f'Tx {i+1}')
             print(f"   📝 Signing: {label}...")
             
-            # 2. Construct Tx
+            SAFE_GAS_LIMIT = 500000 
+
             tx = {
                 'to': tx_data['to'],
                 'data': tx_data['data'],
                 'value': int(tx_data['value']),
-                'gas': 500000, 
-                'gasPrice': self.w3.eth.gas_price,
+                'gas': SAFE_GAS_LIMIT,
+                'gasPrice': gas_price, 
                 'nonce': current_nonce,
-                'chainId': self.w3.eth.chain_id
+                'chainId': self.chain_id
             }
 
-            # 3. Sign
             signed = self.w3.eth.account.sign_transaction(tx, self.account.key)
             
-            # --- COMPATIBILITY FIX: ATTRIBUTES (V6 vs V7) ---
             try:
                 raw_tx = signed.raw_transaction
             except AttributeError:
                 raw_tx = signed.rawTransaction
-            # ------------------------------------------------
 
-            # 4. Broadcast & Wait
             try:
                 tx_hash = self.w3.eth.send_raw_transaction(raw_tx)
                 print(f"   🚀 Broadcasting: {tx_hash.hex()}")
                 
-                # 5. Wait for Settlement
                 receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
                 
-                # --- CRITICAL STATUS CHECK ---
                 if receipt['status'] == 0:
                     raise Exception(f"Transaction Reverted on-chain! Hash: {tx_hash.hex()}")
-                # -----------------------------
 
                 receipts.append(receipt)
                 print("   ✅ Settled on-chain.")
                 
-                # 6. Increment Nonce Safely
                 current_nonce += 1
                 
             except Exception as e:
                 print(f"   ❌ Tx Failed: {e}")
-                # If it's a payment/approval failure, stop. If stocking, continue.
                 if "Pay" in label or "Approve" in label:
                     raise e
                 continue
@@ -85,9 +107,9 @@ class ReapClient:
         return receipts[-1] if receipts else None
 
     def _call_builder(self, endpoint, payload):
+        payload['chain_id'] = self.chain_id
         res = requests.post(f"{self.builder_url}{endpoint}", json=payload)
         if res.status_code != 200:
-            # Try to extract detail message
             try:
                 err_msg = res.json().get('detail', res.text)
             except:
@@ -95,14 +117,68 @@ class ReapClient:
             raise Exception(f"Reap Protocol Error: {err_msg}")
         return res.json()
 
-    # --- PUBLIC API ---
+    # --- SMART AVAILABILITY CHECKS (Holocron Only) ---
 
-    def get_product(self, product_id):
-        """Read-Only Check from Blockchain"""
-        import urllib.parse
-        safe_id = urllib.parse.quote(str(product_id))
-        res = requests.get(f"{self.builder_url}/read/product/{safe_id}")
-        return res.json()
+    def check_holocron(self, coordinate):
+        """Checks if the item is indexed in the Holocron."""
+        print(f"🔎 Scanning Holocron for {coordinate}...")
+        try:
+            exists = self.holocron.functions.checkExistence(int(coordinate)).call()
+        except:
+            exists = False
+
+        print(f"   • Holocron Index: {'✅ FOUND' if exists else '❌ EMPTY'}")
+        return exists
+
+    def _index_to_holocron(self, coordinate):
+        """Internal method to update the Holocron Index."""
+        print(f"   📝 Indexing Coordinate {coordinate} to Holocron...")
+        
+        # Re-fetch nonce/gas for this specific stand-alone op
+        nonce = self.w3.eth.get_transaction_count(self.account.address, 'pending')
+        gas_price = int(self.w3.eth.gas_price * 1.10)
+
+        tx = self.holocron.functions.stock(int(coordinate)).build_transaction({
+            'from': self.account.address,
+            'nonce': nonce,
+            'gas': 150000,
+            'gasPrice': gas_price,
+            'chainId': self.chain_id
+        })
+        signed = self.w3.eth.account.sign_transaction(tx, self.account.key)
+        tx_hash = self.w3.eth.send_raw_transaction(signed.raw_transaction)
+        
+        print(f"   🚀 Broadcast Holocron TX: {tx_hash.hex()}")
+        self.w3.eth.wait_for_transaction_receipt(tx_hash)
+        print("   ✅ Index Updated.")
+        
+        # RPC Sync buffer
+        time.sleep(2)
+
+    def smart_sync(self, item, transactions):
+        """
+        Intelligently syncs the item to the chain.
+        1. If on Holocron -> Assume Available.
+        2. If !Holocron -> Register Data (via TXs) + Index Holocron.
+        """
+        coordinate = item['id']
+        
+        on_holocron = self.check_holocron(coordinate)
+
+        if on_holocron:
+            print("⚡️ Fast Path: Item is indexed. Skipping registration.")
+            return
+
+        print("\n🐢 Syncing to Chain (Full Path)...")
+
+        # Step A: Execute Registration Transactions (provided by API)
+        print("   🔸 Registering Data on-chain...")
+        self._execute_transactions(transactions)
+
+        # Step B: Index on Holocron
+        self._index_to_holocron(coordinate)
+
+    # --- PUBLIC API ---
 
     def register_identity(self, profile_uri="ipfs://default"):
         print("🆔 Registering Protocol Identity...")
@@ -117,32 +193,38 @@ class ReapClient:
             
         return self._execute_transactions(res['transactions'])
 
-    def stock_shelf(self, product_query):
-        print(f"📦 Stocking Shelf: '{product_query}'")
+    def stock_shelf(self, product_query, dry_run=False):
+        """
+        Search for items. 
+        If dry_run=True, returns items + transactions without executing them (for Smart Sync).
+        """
+        print(f"📦 Stocking Shelf: '{product_query}' (Dry Run: {dry_run})")
         res = self._call_builder("/build/inventory/stock", {
             "product_query": product_query,
             "provider_address": self.account.address
         })
         
-        # Handle x402 Negotiation (Payment Required)
+        items = res.get("meta", {}).get("items", [])
+        transactions = res.get("transactions", [])
+
+        # Payment Required
         if res.get("status") == "payment_required":
             print("🛑 402 Payment Required via JSON Spec.")
-            print(f"   🧾 Invoice: {res['meta']['description']}")
-            receipt = self._execute_transactions(res['transactions'])
+            if dry_run: return {"receipt": None, "items": []}
+            receipt = self._execute_transactions(transactions)
             return {"receipt": receipt, "items": []}
             
-        # Handle 200 OK (Bulk Stocking)
-        receipt = self._execute_transactions(res['transactions'])
+        # Success
+        if dry_run:
+            print(f"   👀 Preview: Found {len(items)} items. Cached {len(transactions)} TXs.")
+            return {"receipt": None, "items": items, "transactions": transactions}
         
-        # RETURN DATA (Matches TS behavior)
-        return {
-            "receipt": receipt,
-            "items": res.get("meta", {}).get("items", [])
-        }
+        # Execute immediately (Legacy behavior)
+        receipt = self._execute_transactions(transactions)
+        return {"receipt": receipt, "items": items}
 
     def buy_product(self, product_id):
         print(f"💸 Initiating Agentic Cart (Single Item): {product_id}")
-        # ROUTE TO BATCH ENDPOINT (Same as TS SDK)
         res = self._call_builder("/build/commerce/batch", {
             "product_ids": [product_id]
         })
@@ -154,28 +236,3 @@ class ReapClient:
             "product_ids": product_ids
         })
         return self._execute_transactions(res['transactions'])
-
-    def fetch(self, url, method="GET", json=None, headers={}):
-        """Handles HTTP 402 Negotiation & Reactive Release"""
-        print(f"🌍 Accessing {url}...")
-        response = requests.request(method, url, json=json, headers=headers)
-
-        if response.status_code == 402:
-            print("🛑 x402 Payment Required. Engaging Protocol...")
-            auth_header = response.headers.get("WWW-Authenticate", "")
-            
-            if 'resource_id="' in auth_header:
-                start = auth_header.find('resource_id="') + 13
-                end = auth_header.find('"', start)
-                rid = auth_header[start:end]
-                
-                # Pay Protocol
-                receipt = self.buy_product(rid)
-                proof = receipt['transactionHash'].hex()
-                
-                # Release Data
-                print(f"   🔄 Submitting Proof for Reactive Release: {proof}")
-                headers['Authorization'] = f"X402-Proof {proof}"
-                return requests.request(method, url, json=json, headers=headers)
-        
-        return response
