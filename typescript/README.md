@@ -24,10 +24,15 @@ import { ReapClient } from "@reap-protocol/sdk";
 // Load your private key securely
 const PRIVATE_KEY = process.env.MY_WALLET_KEY || "";
 
+// Optional: Use a specific RPC (e.g., Base Sepolia or Avalanche Fuji)
+const CHAIN_RPC = "https://api.avax-test.network/ext/bc/C/rpc"; 
+
 async function main() {
   // 1. Initialize the Agent
-  // (Points to official middleware by default)
-  const client = new ReapClient(PRIVATE_KEY);
+  const client = new ReapClient(PRIVATE_KEY, CHAIN_RPC);
+  
+  // Wait for Chain ID initialization
+  await new Promise(r => setTimeout(r, 1000));
   console.log("🤖 Agent Online");
 
   try {
@@ -36,25 +41,36 @@ async function main() {
     console.log("🆔 Checking Identity...");
     await client.registerIdentity();
 
-    // 3. JIT Stocking (Discovery)
-    // Searches Web2 (Reap Deals), registers items on-chain, and returns inventory
-    console.log("📦 Stocking Shelf with 'Gaming Laptop'...");
-    const result = await client.stockShelf("Gaming Laptop");
+    // 3. Discovery (Dry Run Mode)
+    // Pass 'true' to get the items AND the transactions without executing them yet.
+    console.log("📦 Browsing for 'Gaming Laptop'...");
     
-    const inventory = result.items;
-    console.log(`   🔍 Found ${inventory.length} items on-chain.`);
+    // dryRun = true
+    const result = await client.stockShelf("Gaming Laptop", true); 
+    
+    const inventory = result.items || [];
+    const transactions = result.transactions || [];
+
+    console.log(`   🔍 Found ${inventory.length} items.`);
 
     if (inventory.length > 0) {
         // 4. Decision Logic
-        // Example: Pick the first available item
-        const target = inventory[0];
-        console.log(`   🎯 Selected: ${target.name} ($${target.price})`);
-        console.log(`      ID: ${target.id}`);
+        // Pick the first item and its corresponding registration transaction
+        const targetItem = inventory[0];
+        const targetTx = transactions[0]; 
 
-        // 5. Agentic Cart (Settlement)
+        console.log(`   🎯 Selected: ${targetItem.name} ($${targetItem.price})`);
+
+        // 5. Smart Sync (The "Gas Saver")
+        // Checks the Holocron (Index) first. 
+        // If the item exists, it skips registration. 
+        // If not, it executes the targetTx and indexes it.
+        await client.smartSync(targetItem, targetTx);
+
+        // 6. Agentic Cart (Settlement)
         // Automatically approves USDC and executes the atomic purchase
         console.log("💸 Buying Item...");
-        const receipt = await client.buyProduct(target.id);
+        const receipt = await client.buyProduct(targetItem.id);
         
         if (receipt) {
             console.log(`🎉 SUCCESS! Transaction Hash: ${receipt.hash}`);
@@ -86,8 +102,8 @@ You can override defaults for custom RPCs or self-hosted middleware.
 ```typescript
 const client = new ReapClient(
   "YOUR_PRIVATE_KEY",
-  "https://base-sepolia.g.alchemy.com/v2/YOUR_KEY", // Custom RPC
-  "https://avax.api.reap.deals"    // Middleware URL
+  "https://avax-fuji.g.alchemy.com/v2/YOUR_KEY", // Custom RPC
+  "https://avax2.api.reap.deals"    // Middleware URL
 );
 ```
 
