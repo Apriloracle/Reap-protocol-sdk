@@ -13,10 +13,18 @@ Give your AI Agent the power to search real products, verify inventory, and purc
 
 ## Contract Address
 
-* **Base_Sepolia**: 0x93498CAda15768E301AB8C6fc3Bc17402Ad078AA
-* **Avax_Fuji**:    0x93498CAda15768E301AB8C6fc3Bc17402Ad078AA
-* **Celo_Sepolia**: 0x93498CAda15768E301AB8C6fc3Bc17402Ad078AA
-* **Arc_Testnet**:  0x93498CAda15768E301AB8C6fc3Bc17402Ad078AA
+* **Base_Sepolia**:
+Contract:       0x93498CAda15768E301AB8C6fc3Bc17402Ad078AA
+HolocronRouter: 0x2cEC5Bf3a0D3fEe4E13e8f2267176BdD579F4fd8
+* **Avax_Fuji**:    
+Contract:       0x93498CAda15768E301AB8C6fc3Bc17402Ad078AA
+HolocronRouter: 0x2cEC5Bf3a0D3fEe4E13e8f2267176BdD579F4fd8
+* **Celo_Sepolia**: 
+Contract:       0x93498CAda15768E301AB8C6fc3Bc17402Ad078AA
+HolocronRouter: 0x2cEC5Bf3a0D3fEe4E13e8f2267176BdD579F4fd8
+* **Arc_Testnet**:  
+Contract:       0x93498CAda15768E301AB8C6fc3Bc17402Ad078AA
+HolocronRouter: 0x2cEC5Bf3a0D3fEe4E13e8f2267176BdD579F4fd8
 
 ## License
 
