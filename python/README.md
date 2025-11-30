@@ -2,7 +2,7 @@
 
 **The official Python SDK for the Reap Protocol: The Agentic Commerce Grid.**
 
-The Reap Protocol enables AI Agents to search for products, register them on-chain (Base Sepolia), and execute atomic purchases without needing to understand smart contract ABIs.
+The Reap Protocol enables AI Agents to search for products, register them on-chain (Avax Fuji, Base Sepolia), and execute atomic purchases without needing to understand smart contract ABIs.
 
 ## 📦 Installation
 
