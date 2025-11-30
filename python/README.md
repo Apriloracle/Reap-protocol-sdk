@@ -12,43 +12,69 @@ pip install reap-protocol
 
 ## 🚀 Quick Start
 
-This example demonstrates the full Agentic Commerce Loop: Identity -> Discovery -> Settlement.
+This example demonstrates the full Agentic Commerce Loop: Identity -> Discovery -> Smart Sync -> Settlement.
 
 ```python
 import os
+import time
 from reap_protocol.client import ReapClient
 
 # 1. Configuration
-# Use a Base Sepolia Wallet with ETH (for gas) and USDC (for purchases)
+# Use a funded testnet wallet (AVAX Fuji, Celo Alfajores, or Base Sepolia)
 PRIVATE_KEY = os.getenv("MY_WALLET_KEY") 
+CHAIN_RPC = "https://api.avax-test.network/ext/bc/C/rpc" # Example: Avalanche Fuji
 
 def main():
-    # Initialize the Agent (Points to official middleware by default)
-    client = ReapClient(private_key=PRIVATE_KEY)
+    # Initialize the Agent
+    client = ReapClient(
+        private_key=PRIVATE_KEY,
+        chain_rpc=CHAIN_RPC
+    )
+    
+    # Wait for connection
+    time.sleep(1)
+    print(f"🤖 Agent Online: {client.account.address}")
 
     # 2. Identity (One-time setup)
     # Registers your wallet as an authorized Agent on the Protocol
     print("🆔 Checking Identity...")
     client.register_identity()
 
-    # 3. JIT Stocking (Discovery)
-    # Searches Web2 (Reap Deals), registers items on-chain, and returns inventory
-    print("📦 Stocking Shelf with 'Gaming Laptop'...")
-    result = client.stock_shelf("Gaming Laptop")
+    # 3. Discovery (Dry Run Mode)
+    # Searches Web2 (Reap Deals). We use dry_run=True to get the data
+    # without executing the registration transactions immediately.
+    print("📦 Browsing for 'Gaming Laptop'...")
     
-    inventory = result.get('items', [])
-    print(f"   🔍 Found {len(inventory)} items on-chain.")
+    result = client.stock_shelf("Gaming Laptop", dry_run=True)
+    
+    items = result.get('items', [])
+    transactions = result.get('transactions', [])
+    
+    print(f"   🔍 Found {len(items)} items.")
 
-    if not inventory:
+    if not items:
+        print("❌ No items found.")
         return
 
     # 4. Decision Logic
     # Example: Pick the first available item
-    target_item = inventory[0]
+    target_item = items[0]
+    
+    # The API returns transactions in the same order as items.
+    # We grab the specific registration TX for this item.
+    target_tx = transactions[0] 
+
     print(f"   🎯 Selected: {target_item['name']} (${target_item['price']})")
     print(f"      ID: {target_item['id']}")
 
-    # 5. Agentic Cart (Settlement)
+    # 5. Smart Sync 
+    # The SDK checks if item is stocked.
+    # - If found: It skips registration (Zero Gas).
+    # - If missing: It runs the registration TX and updates the index.
+    print("🧠 Running Smart Sync...")
+    client.smart_sync(target_item, [target_tx])
+
+    # 6. Agentic Cart (Settlement)
     # Handles ERC20 Approvals and Atomic Purchase in one flow
     print(f"💸 Buying Item...")
     receipt = client.buy_product(target_item['id'])
@@ -67,8 +93,8 @@ You can override defaults for custom RPCs or self-hosted middleware.
 ```python
 client = ReapClient(
     private_key="...",
-    chain_rpc="https://base-sepolia.g.alchemy.com/v2/YOUR_KEY", # Faster RPC
-    builder_url="https://avax.api.reap.deals" # Official Middleware
+    chain_rpc="https://avax-fuji.g.alchemy.com/v2/YOUR_KEY", # Faster RPC
+    builder_url="https://avax2.api.reap.deals" # Official Middleware
 )
 ```
 
@@ -82,3 +108,4 @@ client = ReapClient(
 ## License
 
 MIT
+
