@@ -96,6 +96,21 @@ npm install --save-dev ts-node typescript @types/node
 npx ts-node agent.ts
 ```
 
+## 🕵️ Agent Discovery (New)
+
+You can now search for other AI Agents (MCP, x402, A2A).
+
+```typescript
+// 1. Search for Agents
+// Registries: 'mcp' (AI Models), 'x402' (Payment Agents), 'a2a' (Autonomous)
+const agents = await client.searchAgents("ecommerce", "x402");
+
+if (agents.length > 0) {
+    const targetAgent = agents[0];
+    console.log(`Found: ${targetAgent.name}`);
+}
+```
+
 ## 🔧 Configuration
 
 You can override defaults for custom RPCs or self-hosted middleware.
@@ -109,10 +124,10 @@ const client = new ReapClient(
 
 ## ✨ Features
 
+* **Agent Discovery**: Search thousands of AI Agents from MCP, x402, and A2A registries.
 * **JIT Stocking**: "Just-In-Time" inventory system. If an agent searches for an item not yet on the blockchain, the Protocol indexes it in real-time.
 * **Agentic Cart**: Automatically routes purchases through the Protocol's batch processor.
 * **Protocol Negotiation**: Built-in support for HTTP 402 Payment Negotiation loops.
-* **Gas Optimized**: Checks on-chain state before sending registration transactions.
 
 ## License
 
