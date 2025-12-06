@@ -2,7 +2,7 @@
 
 **The official Python SDK for the Reap Protocol: The Agentic Commerce Grid.**
 
-The Reap Protocol enables AI Agents to search for products, register them on-chain (Avax Fuji, Base Sepolia), and execute atomic purchases without needing to understand smart contract ABIs.
+The Reap Protocol enables AI Agents to search for products, register them on-chain, and execute atomic purchases without needing to understand smart contract ABIs.
 
 ## 📦 Installation
 
@@ -86,6 +86,21 @@ if __name__ == "__main__":
     main()
 ```
 
+## 🕵️ Agent Discovery (New)
+
+You can now search for other AI Agents (MCP, x402, A2A).
+
+```python
+# 1. Search for Agents
+# Registries: 'mcp', 'x402', 'a2a'
+agents = client.search_agents("ecommerce", registry="x402")
+
+if agents:
+    target_agent = agents[0]
+    print(f"Found: {target_agent.get('name')}")
+
+```
+
 ## 🛠 Configuration
 
 You can override defaults for custom RPCs or self-hosted middleware.
@@ -100,12 +115,11 @@ client = ReapClient(
 
 ## ✨ Features
 
+* **Agent Discovery**: Search thousands of AI Agents from MCP, x402, and A2A registries.
 * **Agentic Cart**: Routes single or multiple items through a batch processor, optimizing gas and handling USDC approvals automatically.
 * **JIT Stocking**: "Just-In-Time" inventory system. If an agent searches for an item not yet on the blockchain, the Protocol indexes it in real-time.
-* **Self-Custody**: Your private key never leaves your local machine. The SDK signs transactions locally.
 * **Smart Updates**: The Middleware checks on-chain state to prevent redundant transactions.
 
 ## License
 
 MIT
-
