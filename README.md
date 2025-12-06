@@ -6,6 +6,7 @@ Give your AI Agent the power to search real products, verify inventory, and purc
 
 ## Why Reap
 
+* **Agent Discovery**: Search thousands of AI Agents from MCP, x402, and A2A registries.
 * **Product Search → On-Chain Inventory**: Agents can index any Web2 product with a single call.
 * **x402 Negotiation Engine**: Turns HTTP into a payment-capable negotiation loop.
 * **Agentic Cart**: Identity, stock, and settlement in a single atomic mission.
